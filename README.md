@@ -29,7 +29,7 @@ poetry run vox speak
 - Press Ctrl+C to stop recording
 - Wait for the response
 
-3. **Run the chat intefrace**:
+3. **Run the chat interface**:
 ```bash
 poetry run vox chat
 ```
