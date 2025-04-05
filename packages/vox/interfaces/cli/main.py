@@ -4,6 +4,7 @@ CLI interface for Vox Agent OS.
 import asyncio
 import os
 import subprocess
+import logging
 from typing import Optional
 from pathlib import Path
 
@@ -13,13 +14,14 @@ from rich.console import Console
 from rich.prompt import Prompt
 from dotenv import load_dotenv, find_dotenv
 
-from ...voice.recorder import VoiceRecorder
-from ...voice.transcriber import WhisperTranscriber
-from ...voice.speaker import speak
-from ...tools.summarize import summarize_text
-from ...kernel import Agent
+from vox.utils.logging import setup_logger
+from vox.voice.recorder import VoiceRecorder
+from vox.voice.transcriber import WhisperTranscriber
+from vox.voice.speaker import speak
+from vox.kernel.agent import Agent
 
-# Initialize console
+# Initialize logger
+logger = setup_logger()
 console = Console()
 
 def setup_environment():
@@ -71,46 +73,40 @@ def handle_api_error(e: Exception):
 @app.command()
 def talk(duration: Optional[float] = typer.Option(None)):
     """Record voice command and execute it."""
-    api_key = setup_environment()
-    openai.api_key = api_key
-    
-    # Initialize recorder
-    recorder = VoiceRecorder(
-        sample_rate=int(os.getenv("SAMPLE_RATE", "44100"))
-    )
+    logger.info("Starting voice command session")
     
     try:
+        api_key = setup_environment()
+        
+        # Initialize agent
+        agent = Agent()
+        
         # Record audio
+        recorder = VoiceRecorder()
+        console.print("[bold yellow]🎤 Recording...[/bold yellow] Press Ctrl+C to stop")
         recorder.record(duration)
         audio_path = recorder.save()
         
         try:
             # Transcribe
             transcriber = WhisperTranscriber(api_key=api_key)
+            console.print("[bold yellow]🎯 Transcribing audio...[/bold yellow]")
             text = transcriber.transcribe(audio_path)
+            console.print(f"[bold green]✓ Transcribed:[/bold green] {text}")
             
-            # Process command
-            if "summarize" in text.lower():
-                text_to_summarize = text.lower().split("summarize", 1)[1].strip()
-                result = summarize_text(text_to_summarize)
-                
-                if result["status"] == "success":
-                    response = f"Here's your summary: {result['summary']}"
-                else:
-                    response = f"Sorry, I couldn't summarize that. Error: {result.get('error', 'unknown error')}"
-            else:
-                response = "I can only summarize text for now. Try saying 'summarize' followed by your text."
+            # Process with agent
+            response = agent.process_request(text)
             
             # Output response
             console.print(f"\n[bold purple]Agent[/bold purple]: {response}\n")
-            speak(response)  # Speak the response
+            speak(response)
             
         finally:
-            # Clean up audio file
             if audio_path.exists():
                 audio_path.unlink()
     
     except Exception as e:
+        logger.error(f"Error in voice command session: {str(e)}", exc_info=True)
         handle_api_error(e)
         raise typer.Exit(1)
 
@@ -129,24 +125,26 @@ def chat(
     console.print("[bold blue]Vox Agent OS[/bold blue] - Text interface")
     console.print("Type 'exit' to quit\n")
     
-    def chat_loop():
-        while True:
-            try:
-                request = Prompt.ask("[bold green]You[/bold green]")
+    while True:
+        try:
+            request = Prompt.ask("[bold green]You[/bold green]")
+            
+            if request.lower() == "exit":
+                console.print("[yellow]Goodbye![/yellow]")
+                break
                 
-                if request.lower() == "exit":
-                    break
-                    
-                with console.status("[bold yellow]Thinking...[/bold yellow]"):
-                    response = agent.process_request(request)
-                
-                console.print(f"\n[bold purple]Agent[/bold purple]: {response}\n")
-                speak(response)
-                
-            except Exception as e:
-                handle_api_error(e)
-                if isinstance(e, (openai.AuthenticationError, openai.RateLimitError)):
-                    break
+            with console.status("[bold yellow]Thinking...[/bold yellow]"):
+                # Process the request synchronously
+                response = agent.process_request(request)
+            
+            console.print(f"\n[bold purple]Agent[/bold purple]: {response}\n")
+            
+        except Exception as e:
+            handle_api_error(e)
+            if isinstance(e, (openai.AuthenticationError, openai.RateLimitError)):
+                break
+            # For other errors, continue the chat loop
+            continue
 
 if __name__ == "__main__":
     app() 

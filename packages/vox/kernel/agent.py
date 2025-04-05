@@ -1,55 +1,32 @@
 """
-Core Agent class that orchestrates planning and execution of user requests.
+Core Agent class that orchestrates multi-agent execution.
 """
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Optional
+from packages.vox.agents.crew_ai.pdf_summarizer_crew import Crew
 
-from .planner import Planner
-from .executor import Executor
+logger = logging.getLogger("vox")
 
 class Agent:
-    """
-    Core Agent class that handles:
-    - Understanding user intent
-    - Planning actions using tools
-    - Executing plans
-    - Maintaining conversation context
-    """
-    
     def __init__(
         self,
         model: str = "gpt-4-turbo-preview",
-        memory_path: Optional[str] = None,
-        tool_registry: Optional[Dict[str, Any]] = None
+        memory_path: Optional[str] = None
     ):
-        self.planner = Planner(model=model)
-        self.executor = Executor(tool_registry=tool_registry or {})
-        self.conversation_history: List[Dict[str, str]] = []
+        self.crew = Crew()
+        self.model = model
+        logger.debug(f"Initialized Agent with model: {model}")
         
-    async def process_request(self, request: str) -> str:
-        """Process a user request through the plan → execute → respond loop."""
-        # Add request to history
-        self.conversation_history.append({"role": "user", "content": request})
+    def process_request(self, request: str) -> str:
+        """Process a request using the agent crew."""
+        logger.info(f"Processing request: {request}")
         
         try:
-            # Generate plan
-            plan = await self.planner.create_plan(
-                request,
-                conversation_history=self.conversation_history
-            )
-            
-            # Execute plan
-            response = await self.executor.execute_plan(plan)
-            
-            # Add response to history
-            self.conversation_history.append({"role": "assistant", "content": response})
-            
+            response = self.crew.process_request(request)
+            logger.debug(f"Generated response: {response}")
             return response
             
         except Exception as e:
             error_msg = f"Error processing request: {str(e)}"
-            self.conversation_history.append({"role": "assistant", "content": error_msg})
-            return error_msg
-    
-    def reset(self):
-        """Reset the agent's conversation history."""
-        self.conversation_history = [] 
+            logger.error(error_msg, exc_info=True)
+            return error_msg 
