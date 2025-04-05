@@ -11,6 +11,8 @@ A voice-first agent interface that lets you interact with AI tools using natural
 
 ## 🚀 Getting Started
 
+This product supports only MacOS currently.
+
 1. **Set up your environment**:
 ```bash
 # Install dependencies
@@ -27,19 +29,14 @@ poetry run vox speak
 - Press Ctrl+C to stop recording
 - Wait for the response
 
-3. **Example command**:
-   Say: "Summarize this text: AgentOS is a platform for creating AI agents"
+3. **Run the chat intefrace**:
+```bash
+poetry run vox chat
+```
 
-## 📦 Project Structure
-vox-agent-os/
-├── packages/
-│ └── vox/
-│ ├── kernel/ # Core agent logic
-│ ├── voice/ # Voice recording and TTS
-│ ├── tools/ # Tool implementations
-│ └── interfaces/ # CLI interface
-├── examples/ # Usage examples
-└── docs/ # Documentation
+4. **Example command**:
+   Say: "Summarize the PDF document about my tax receipts"
+Note: The MVP only works currently if you use the words summarize and PDF in your command.
 
 ## 🛠️ Development
 
@@ -54,6 +51,42 @@ vox-agent-os/
 - More AI tools
 - Custom TTS options
 - Continuous conversation mode
+
+## 📦 Project Structure
+
+```text
+vox-agent-os/
+├── LICENSE
+├── README.md
+├── docs
+├── examples
+├── logs
+│   └── run.log
+├── packages
+│   └── vox
+│       ├── agents
+│       │   └── crew_ai
+│       ├── interfaces
+│       │   ├── android_proxy
+│       │   ├── cli
+│       │   └── desktop
+│       ├── kernel
+│       │   ├── __init__.py
+│       │   └── agent.py
+│       ├── memory
+│       ├── tools
+│       │   ├── pdf_reader.py
+│       │   └── summarize.py
+│       ├── utils
+│       │   └── logging.py
+│       └── voice
+│           ├── recorder.py
+│           ├── speaker.py
+│           └── transcriber.py
+├── poetry.lock
+├── pyproject.toml
+└── scripts
+```
 
 ## 📜 License
 
