@@ -5,7 +5,7 @@ from typing import Dict, List
 import logging
 import os
 import json
-from packages.vox.agents.crew_ai.pdf_summarizer.specialized_agents import ReaderAgent, SummarizerAgent, CoordinatorAgent, FinderAgent
+from pkg.agents.open.crew_ai.pdf_summarizer.specialized_agents import ReaderAgent, SummarizerAgent, CoordinatorAgent, FinderAgent
 
 # Get logger
 logger = logging.getLogger("vox")

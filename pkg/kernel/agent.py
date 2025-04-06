@@ -5,8 +5,9 @@ import logging
 from typing import Optional, Tuple
 from rich.console import Console
 from rich.prompt import Prompt
-from vox.agents.crew_ai.pdf_summarizer.pdf_summarizer_crew import PDFCrew
-from vox.agents.crew_ai.slack_messager.slack_messager_crew import SlackCrew
+from pkg.agents.open.crew_ai.pdf_summarizer.pdf_summarizer_crew import PDFCrew
+from pkg.agents.open.crew_ai.slack_messager.slack_messager_crew import SlackCrew
+from pkg.agents.licensed.crew_ai.soc2_auditor.soc2_auditor_crew import SOC2AuditorCrew
 from pprint import pprint
 
 logger = logging.getLogger("vox")

@@ -5,7 +5,7 @@ import os
 import json
 import logging
 from dotenv import load_dotenv
-from vox.tools.slack_messager import SlackMessagerTool
+from pkg.tools.open.slack_messager import SlackMessagerTool
 
 logger = logging.getLogger("vox")
 

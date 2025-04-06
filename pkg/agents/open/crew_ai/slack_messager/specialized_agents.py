@@ -1,8 +1,8 @@
 """
 Specialized agents for Slack messaging.
 """
-from vox.agents.crew_ai.base import BaseAgent
-from vox.tools.slack_messager import SlackMessagerTool
+from pkg.agents.open.crew_ai.base import BaseAgent
+from pkg.tools.open.slack_messager import SlackMessagerTool
 from typing import Dict
 import os
 

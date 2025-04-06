@@ -14,11 +14,11 @@ from rich.console import Console
 from rich.prompt import Prompt
 from dotenv import load_dotenv, find_dotenv
 
-from vox.utils.logging import setup_logger
-from vox.voice.recorder import VoiceRecorder
-from vox.voice.transcriber import WhisperTranscriber
-from vox.voice.speaker import speak
-from vox.kernel.agent import Agent
+from pkg.utils.logging import setup_logger
+from pkg.voice.recorder import VoiceRecorder
+from pkg.voice.transcriber import WhisperTranscriber
+from pkg.voice.speaker import speak
+from pkg.kernel.agent import Agent
 
 # Initialize logger
 logger = setup_logger()

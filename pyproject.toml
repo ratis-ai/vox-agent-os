@@ -5,7 +5,7 @@ description = "An open-source, voice-first Agent OS for human-computer interacti
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 packages = [
-    { include = "vox", from = "packages" }
+    { include = "pkg" }
 ]
 
 [tool.poetry.dependencies]
@@ -36,4 +36,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-vox = "vox.interfaces.cli.main:app"
+vox = "pkg.interfaces.cli.main:app"
+soc2 = "pkg.interfaces.cli.soc2_runner:app"

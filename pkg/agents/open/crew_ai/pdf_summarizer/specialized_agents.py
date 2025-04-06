@@ -1,9 +1,9 @@
 """
 Specialized agents for different tasks.
 """
-from vox.agents.crew_ai.base import BaseAgent
-from vox.tools.summarize import summarize_text
-from vox.tools.pdf_reader import read_pdf, find_pdf
+from pkg.agents.open.crew_ai.base import BaseAgent
+from pkg.tools.open.summarize import summarize_text
+from pkg.tools.open.pdf_reader import read_pdf
 from typing import Dict
 from pprint import pprint
 

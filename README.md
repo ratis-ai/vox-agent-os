@@ -90,4 +90,13 @@ vox-agent-os/
 
 ## 📜 License
 
-MIT License - see LICENSE file for details
+## Licensing
+
+- The core of this project is licensed under the MIT License.
+- However, the following modules are subject to a separate Commercial License:
+
+  - `pkg/agents/licensed/`
+  - `pkg/tools/licensed/`
+
+See LICENSE.bsl.md for more details.
+To obtain access to licensed modules, reach out at contact@agenticflow.app
