@@ -42,3 +42,13 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# Licensed folders
+pkg/agents/licensed/*
+pkg/tools/licensed/*
+
+# Specific files
+scripts/setup_composio_gdocs_integration.py
+scripts/setup_composio_gdrive_integration.py
+scripts/test_gdocs_reader.py
+scripts/test_gdrive_reader.py
