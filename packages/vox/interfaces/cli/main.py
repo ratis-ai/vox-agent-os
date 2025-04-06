@@ -24,6 +24,12 @@ from vox.kernel.agent import Agent
 logger = setup_logger()
 console = Console()
 
+def add_initial_logs_divider():
+    """Add a divider to the logs."""
+    logger.info("--------------------------------")
+    logger.info("New Session Started")
+    logger.info("--------------------------------")
+
 def setup_environment():
     """Setup environment variables and API keys."""
     # Try to find and load .env file
@@ -94,8 +100,15 @@ def talk(duration: Optional[float] = typer.Option(None)):
             text = transcriber.transcribe(audio_path)
             console.print(f"[bold green]✓ Transcribed:[/bold green] {text}")
             
+            # Determine command type from transcribed text
+            command_type = None
+            if "summarize" in text.lower() and "pdf" in text.lower():
+                command_type = "1"
+            elif "send" in text.lower() and "slack" in text.lower():
+                command_type = "2"
+            
             # Process with agent
-            response = agent.process_request(text)
+            response = agent.process_request(text, command_type)
             
             # Output response
             console.print(f"\n[bold purple]Agent[/bold purple]: {response}\n")
@@ -114,37 +127,43 @@ def talk(duration: Optional[float] = typer.Option(None)):
 def chat(
     model: str = typer.Option("gpt-4", help="Language model to use"),
     memory: Optional[str] = typer.Option(None, help="Path to memory file"),
+    use_defaults: bool = typer.Option(False, help="Use defaults")
 ):
     """Start an interactive text chat session with the agent."""
     # Setup environment and API key
     api_key = setup_environment()
     openai.api_key = api_key
+
+    add_initial_logs_divider()
     
     agent = Agent(model=model, memory_path=memory)
     
     console.print("[bold blue]Vox Agent OS[/bold blue] - Text interface")
     console.print("Type 'exit' to quit\n")
+
+    defaults = {}
+    if use_defaults:
+        defaults = {
+            "choice": "2",
+            "channel": "#all-agenticflow",
+            "message": "Hello, how are you?"
+        }
     
     while True:
         try:
-            request = Prompt.ask("[bold green]You[/bold green]")
-            
-            if request.lower() == "exit":
+            # Show menu and get user choice
+            response = agent.process_request(defaults = defaults)
+            if response == "Goodbye!":
                 console.print("[yellow]Goodbye![/yellow]")
                 break
                 
-            with console.status("[bold yellow]Thinking...[/bold yellow]"):
-                # Process the request synchronously
-                response = agent.process_request(request)
-            
             console.print(f"\n[bold purple]Agent[/bold purple]: {response}\n")
+            break
             
         except Exception as e:
             handle_api_error(e)
-            if isinstance(e, (openai.AuthenticationError, openai.RateLimitError)):
-                break
-            # For other errors, continue the chat loop
-            continue
+            print(e)
+            break
 
 if __name__ == "__main__":
     app() 
